@@ -1,0 +1,6 @@
+venv/
+dataset/
+model/
+uploads/
+__pycache__/
+*.keras
