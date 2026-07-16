@@ -1,4 +1,6 @@
 import os
+import uuid
+
 from flask import (
     Flask,
     render_template,
@@ -6,12 +8,15 @@ from flask import (
     redirect,
     send_from_directory
 )
+
 from werkzeug.utils import secure_filename
 
 from predict import predict_image
 from report_generator import generate_pdf
 
+
 app = Flask(__name__)
+
 
 # ===================================================
 # Configuration
@@ -27,6 +32,7 @@ os.makedirs(REPORT_FOLDER, exist_ok=True)
 
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
+
 # ===================================================
 # Dashboard Variables
 # ===================================================
@@ -37,6 +43,7 @@ fake_count = 0
 
 history = []
 
+
 # ===================================================
 # Home Page
 # ===================================================
@@ -44,29 +51,40 @@ history = []
 @app.route("/", methods=["GET", "POST"])
 def index():
 
-    global total_scans
-    global real_count
-    global fake_count
-    global history
+    global total_scans, real_count, fake_count, history
+
 
     if request.method == "POST":
 
         if "file" not in request.files:
             return redirect(request.url)
 
+
         file = request.files["file"]
+
 
         if file.filename == "":
             return redirect(request.url)
 
+
         filename = secure_filename(file.filename)
+
+
+        # Avoid duplicate filenames
+        unique_filename = (
+            str(uuid.uuid4()) + "_" + filename
+        )
+
 
         filepath = os.path.join(
             app.config["UPLOAD_FOLDER"],
-            filename
+            unique_filename
         )
 
+
         file.save(filepath)
+
+
 
         # ===================================
         # Prediction
@@ -74,39 +92,55 @@ def index():
 
         result = predict_image(filepath)
 
+
+
         # ===================================
         # Dashboard Statistics
         # ===================================
 
         total_scans += 1
 
+
         if result["prediction"] == "Real Human":
             real_count += 1
         else:
             fake_count += 1
+
+
 
         # ===================================
         # Save History
         # ===================================
 
         history.append({
-            "image": filename,
+
+            "image": unique_filename,
+
             "prediction": result["prediction"],
+
             "status": result["status"]
+
         })
+
+
 
         # ===================================
         # Generate PDF Report
         # ===================================
 
-        
-
         pdf_file = generate_pdf(
+
             result["prediction"],
+
             result["status"],
+
             filepath,
+
             None
+
         )
+
+
 
         # ===================================
         # Result Page
@@ -122,7 +156,7 @@ def index():
 
             reasons=result["reasons"],
 
-            image=filename,
+            image=unique_filename,
 
             heatmap=result["heatmap"],
 
@@ -130,7 +164,9 @@ def index():
 
         )
 
+
     return render_template("index.html")
+
 
 
 # ===================================================
@@ -155,6 +191,7 @@ def dashboard():
     )
 
 
+
 # ===================================================
 # History
 # ===================================================
@@ -169,6 +206,7 @@ def history_page():
         history=history
 
     )
+
 
 
 # ===================================================
@@ -189,11 +227,12 @@ def download_report(filename):
     )
 
 
+
 # ===================================================
 # REST API
 # ===================================================
 
-@app.route("/api", methods=["GET"])
+@app.route("/api")
 def api():
 
     return {
@@ -209,10 +248,19 @@ def api():
     }
 
 
+
 # ===================================================
 # Run Flask
 # ===================================================
 
 if __name__ == "__main__":
 
-    app.run(debug=True)
+    app.run(
+
+        host="0.0.0.0",
+
+        port=int(os.environ.get("PORT", 5000)),
+
+        debug=False
+
+    )
