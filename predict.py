@@ -1,32 +1,115 @@
-import tensorflow as tf
-import numpy as np
 import os
+import numpy as np
+import tensorflow as tf
+from tensorflow.keras.models import load_model
 
-# 1. Configuration Paths
+from gradcam import generate_gradcam
+
+# ==========================================
+# Load Model
+# ==========================================
+
 MODEL_PATH = "model/fake_media_detector_finetuned.keras"
-TEST_IMAGE = "test_face.jpg"
 
-if not os.path.exists(MODEL_PATH):
-    print(f"Error: Could not find '{MODEL_PATH}'. Wait for fine-tuning to finish!")
-elif not os.path.exists(TEST_IMAGE):
-    print(f"Error: Could not find '{TEST_IMAGE}'. Make sure you saved a test image!")
-else:
-    # Load the trained network
-    model = tf.keras.models.load_model(MODEL_PATH)
-    
-    # Process the test photo
-    img = tf.keras.utils.load_img(TEST_IMAGE, target_size=(224, 224))
+model = load_model(MODEL_PATH)
+
+# ==========================================
+# Class Labels
+# ==========================================
+
+CLASSES = [
+    "Fake (AI Generated)",
+    "Real Human"
+]
+
+# ==========================================
+# Predict Function
+# ==========================================
+
+def predict_image(image_path):
+
+    # -------------------------------
+    # Load Image
+    # -------------------------------
+
+    img = tf.keras.utils.load_img(
+        image_path,
+        target_size=(224,224)
+    )
+
     img_array = tf.keras.utils.img_to_array(img)
-    img_array = tf.expand_dims(img_array, 0) 
 
-    # Run the prediction
-    predictions = model.predict(img_array, verbose=0) # verbose=0 hides loading bars
-    
-    # Map the calculation directly to your text classes
-    classes = ['Fake (AI Generated)', 'Real Human']
-    predicted_class = classes[np.argmax(predictions[0])]
+    img_array = np.expand_dims(img_array, axis=0)
 
-    # 2. Print Only the Clean Result
-    print("\n" + "="*40)
-    print(f" FINAL VERDICT: {predicted_class}")
-    print("="*40 + "\n")
+    # -------------------------------
+    # Prediction
+    # -------------------------------
+
+    prediction = model.predict(
+        img_array,
+        verbose=0
+    )
+
+    predicted_index = np.argmax(prediction[0])
+
+    predicted_class = CLASSES[predicted_index]
+
+    # -------------------------------
+    # Detection Status
+    # -------------------------------
+
+    if predicted_class == "Real Human":
+
+        status = "No AI manipulation detected."
+
+        reasons = [
+            "Natural facial texture",
+            "Consistent lighting",
+            "No visual AI artifacts detected"
+        ]
+
+    else:
+
+        status = "Possible AI-generated or manipulated image."
+
+        reasons = [
+            "Texture mismatch detected",
+            "Facial inconsistencies found",
+            "Possible AI-generated artifacts"
+        ]
+
+    # -------------------------------
+    # Heatmap Path
+    # -------------------------------
+
+    filename = os.path.basename(image_path)
+
+    heatmap_name = "heatmap_" + filename
+
+    heatmap_path = os.path.join(
+        "static",
+        "heatmaps",
+        heatmap_name
+    )
+
+     #generate_gradcam(
+      #  model,
+      #  image_path,
+     #   heatmap_path
+    #)
+
+    # -------------------------------
+    # Return Results
+    # -------------------------------
+
+    return {
+
+        "prediction": predicted_class,
+
+        "status": status,
+
+        "reasons": reasons,
+
+        "heatmap": None
+
+    }

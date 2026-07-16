@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Prediction History</title>
+
+<link rel="stylesheet"
+href="{{ url_for('static', filename='css/style.css') }}">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+</head>
+
+<body>
+
+<nav class="navbar">
+
+<div class="logo">
+
+<i class="fa-solid fa-shield-halved"></i>
+
+AI Fake Media Detector
+
+</div>
+
+<div class="nav-links">
+
+<a href="/">Home</a>
+
+<a href="/dashboard">Dashboard</a>
+
+<a href="/history">History</a>
+
+</div>
+
+</nav>
+
+<section class="hero">
+
+<h1>Prediction History</h1>
+
+<p>All images analyzed by the system</p>
+
+</section>
+
+<div class="table-container">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Image</th>
+
+<th>Prediction</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for item in history %}
+
+<tr>
+
+<td>
+
+<img src="{{ url_for('static', filename='uploads/' + item.image) }}"
+class="history-image">
+
+{{ item.image }}
+
+</td>
+
+<td>
+
+{% if item.prediction == "Real Human" %}
+
+<span class="real-badge">
+
+Real Human
+
+</span>
+
+{% else %}
+
+<span class="fake-badge">
+
+Fake (AI Generated)
+
+</span>
+
+{% endif %}
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</body>
+
+</html>

@@ -3,78 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Media Detector</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background-color: #f4f6f9;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        .container {
-            background-color: #ffffff;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            width: 400px;
-        }
-        h2 {
-            color: #333;
-            margin-bottom: 20px;
-        }
-        input[type="file"] {
-            margin: 20px 0;
-            display: block;
-            width: 100%;
-        }
-        button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            font-size: 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            width: 100%;
-            font-weight: bold;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .result-box {
-            margin-top: 30px;
-            padding: 15px;
-            border-radius: 6px;
-            font-size: 18px;
-            font-weight: bold;
-            background-color: #e9ecef;
-            color: #495057;
-            border: 1px solid #ced4da;
-        }
-    </style>
+    <title>AI Fake Media Detector</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
 
-<div class="container">
-    <h2>AI Media Detector</h2>
-    <p>Upload a face image to check if it's Real or Fake.</p>
-    
-    <form action="/" method="POST" enctype="multipart/form-data">
-        <input type="file" name="file" accept="image/*" required>
-        <button type="submit">Analyze Image</button>
-    </form>
-
-    {% if result %}
-        <div class="result-box">
-            VERDICT: {{ result }}
+    <!-- ================= NAVBAR ================= -->
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-shield-halved"></i>
+            AI Fake Media Detector
         </div>
-    {% endif %}
-</div>
+
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/dashboard">Dashboard</a>
+        </div>
+    </nav>
+
+    <!-- ================= HERO SECTION ================= -->
+    <section class="hero">
+
+        <h1>Detect AI Generated & Manipulated Images</h1>
+
+        <p>
+            Upload an image and let our model
+            determine whether it is <b>Real</b> or <b>Fake</b>.
+        </p>
+
+        <!-- ================= Upload Card ================= -->
+
+        <div class="upload-card">
+
+            <form action="/" method="POST" enctype="multipart/form-data">
+
+                <div class="upload-box">
+
+                    <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+
+                    <h2>Upload Image</h2>
+
+                    <p>Drag & Drop or Browse an Image</p>
+
+                    <input
+                        type="file"
+                        id="file"
+                        name="file"
+                        accept="image/*"
+                        required>
+
+                </div>
+
+                <button type="submit" class="analyze-btn">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    Analyze Image
+                </button>
+
+            </form>
+
+        </div>
+
+        <!-- ================= RESULT ================= -->
+
+        {% if result %}
+
+        <div class="result-card">
+
+            <h2>
+                <i class="fa-solid fa-circle-check"></i>
+                Detection Result
+            </h2>
+
+            <h1>{{ result }}</h1>
+
+        </div>
+
+        {% endif %}
+
+    </section>
+
+    <!-- ================= FEATURES ================= -->
+
+    <section class="features">
+
+        <div class="feature-card">
+
+            <i class="fa-solid fa-robot"></i>
+
+            <h3>AI Detection</h3>
+
+            <p>
+                EfficientNetB0 identifies whether the uploaded
+                image is Real or Fake.
+            </p>
+
+        </div>
+
+        <div class="feature-card">
+
+            <i class="fa-solid fa-fire"></i>
+
+            <h3>Grad-CAM</h3>
+
+            <p>
+                Visualizes suspicious regions
+                responsible for the prediction.
+            </p>
+
+        </div>
+
+        <div class="feature-card">
+
+            <i class="fa-solid fa-chart-column"></i>
+
+            <h3>Dashboard</h3>
+
+            <p>
+                Monitor total scans,
+                real images and fake images.
+            </p>
+
+        </div>
+
+        <div class="feature-card">
+
+            <i class="fa-solid fa-file-pdf"></i>
+
+            <h3>PDF Report</h3>
+
+            <p>
+                Download a professional report
+                containing prediction details.
+            </p>
+
+        </div>
+
+    </section>
+
+   
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <p>
+            Developed by <b>Sindhuja Mekala</b>
+        </p>
+
+        <p>
+            AI Powered Fake Media Detection System
+        </p>
+
+    </footer>
+
+    <!-- JS -->
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 
 </body>
 </html>

@@ -1,6 +1,8 @@
 venv/
 dataset/
-model/
 uploads/
 __pycache__/
-*.keras
+reports/
+static/uploads/
+*.pyc
+.env

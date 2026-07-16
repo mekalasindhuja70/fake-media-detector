@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detection Result</title>
+
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}">
+
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- ===================== NAVBAR ===================== -->
+
+    <nav class="navbar">
+
+        <div class="logo">
+
+            <i class="fa-solid fa-shield-halved"></i>
+
+            Fake Media Detector
+
+        </div>
+
+        <ul class="nav-links">
+
+            <li><a href="/">Home</a></li>
+
+            <li><a href="/dashboard">Dashboard</a></li>
+
+            <li><a href="/history">History</a></li>
+
+        </ul>
+
+    </nav>
+
+    <!-- ===================== HEADER ===================== -->
+
+    <section class="hero">
+
+        <h1>Detection Completed</h1>
+
+        <p>AI has finished analyzing your uploaded image.</p>
+
+    </section>
+
+    <!-- ===================== TOP SECTION ===================== -->
+
+    <div class="top-container">
+
+        <!-- Uploaded Image -->
+
+        <div class="card">
+
+            <h2>
+
+                <i class="fa-solid fa-image"></i>
+
+                Uploaded Image
+
+            </h2>
+
+            <img src="{{ url_for('static', filename='uploads/' + image) }}"
+                class="result-image">
+
+        </div>
+
+        <!-- Summary Card -->
+
+        <div class="card">
+
+            <h2>
+
+                <i class="fa-solid fa-clipboard-list"></i>
+
+                Detection Summary
+
+            </h2>
+
+            <div class="summary-item">
+
+                <i class="fa-solid fa-microchip"></i>
+
+                <div>
+
+                    <h3>Model</h3>
+
+                    <p>EfficientNetB0</p>
+
+                </div>
+
+            </div>
+
+            <div class="summary-item">
+
+                <i class="fa-solid fa-desktop"></i>
+
+                <div>
+
+                    <h3>Framework</h3>
+
+                    <p>TensorFlow + Flask</p>
+
+                </div>
+
+            </div>
+
+            <div class="summary-item">
+
+                <i class="fa-solid fa-expand"></i>
+
+                <div>
+
+                    <h3>Input Size</h3>
+
+                    <p>224 × 224</p>
+
+                </div>
+
+            </div>
+
+            <div class="summary-item">
+
+                <i class="fa-solid fa-circle-check"></i>
+
+                <div>
+
+                    <h3>Status</h3>
+
+                    <p>{{ prediction }}</p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ===================== RESULT CARD ===================== -->
+
+    <div class="prediction-card">
+
+        {% if prediction == "Real Human" %}
+
+        <h1 class="real-result">
+
+            <i class="fa-solid fa-circle-check"></i>
+
+            {{ prediction }}
+
+        </h1>
+
+        {% else %}
+
+        <h1 class="fake-result">
+
+            <i class="fa-solid fa-circle-xmark"></i>
+
+            {{ prediction }}
+
+        </h1>
+
+        {% endif %}
+
+        <br>
+
+        <h2>
+
+            <i class="fa-solid fa-magnifying-glass"></i>
+
+            Detection Details
+
+        </h2>
+
+        <br>
+
+        <p class="status-text">
+
+            {{ status }}
+
+        </p>
+
+        <br>
+
+        <h2>
+
+            <i class="fa-solid fa-list-check"></i>
+
+            Detection Reasons
+
+        </h2>
+
+        <ul class="reason-list">
+
+            {% for reason in reasons %}
+
+            <li>
+
+                <i class="fa-solid fa-check"></i>
+
+                {{ reason }}
+
+            </li>
+
+            {% endfor %}
+
+        </ul>
+
+        <div class="button-group">
+
+            <a href="/download/{{ pdf }}" class="download-btn">
+
+                <i class="fa-solid fa-file-pdf"></i>
+
+                Download PDF Report
+
+            </a>
+
+            <a href="/" class="home-btn">
+
+                <i class="fa-solid fa-house"></i>
+
+                Analyze Another Image
+
+            </a>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>
