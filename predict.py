@@ -2,9 +2,7 @@ import os
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.models import load_model
-
-from gradcam import generate_gradcam
-
+from tensorflow.keras.applications.efficientnet import preprocess_input
 
 # ==========================================
 # Load Model
@@ -18,8 +16,9 @@ MODEL_PATH = os.path.join(
     "fake_media_detector_finetuned.keras"
 )
 
+print("Loading model...")
 model = load_model(MODEL_PATH)
-
+print("Model Loaded Successfully!")
 
 # ==========================================
 # Class Labels
@@ -30,49 +29,36 @@ CLASSES = [
     "Real Human"
 ]
 
-
 # ==========================================
 # Predict Function
 # ==========================================
 
 def predict_image(image_path):
 
-    # -------------------------------
-    # Load Image
-    # -------------------------------
+    print("Reading image:", image_path)
 
     img = tf.keras.utils.load_img(
         image_path,
         target_size=(224, 224)
     )
 
-    img_array = tf.keras.utils.img_to_array(img)
+    img = tf.keras.utils.img_to_array(img)
 
-    img_array = np.expand_dims(
-        img_array,
-        axis=0
-    )
+    img = preprocess_input(img)
 
+    img = np.expand_dims(img, axis=0)
 
-    # -------------------------------
-    # Prediction
-    # -------------------------------
+    print("Running prediction...")
 
-    prediction = model.predict(
-        img_array,
-        verbose=0
-    )
+    prediction = model.predict(img, verbose=0)
 
-    predicted_index = np.argmax(
-        prediction[0]
-    )
+    print("Prediction:", prediction)
+
+    predicted_index = np.argmax(prediction)
+
+    confidence = float(np.max(prediction)) * 100
 
     predicted_class = CLASSES[predicted_index]
-
-
-    # -------------------------------
-    # Detection Status
-    # -------------------------------
 
     if predicted_class == "Real Human":
 
@@ -81,54 +67,24 @@ def predict_image(image_path):
         reasons = [
             "Natural facial texture",
             "Consistent lighting",
-            "No visual AI artifacts detected"
+            "No AI artifacts detected"
         ]
 
     else:
 
-        status = "Possible AI-generated or manipulated image."
+        status = "Possible AI-generated image detected."
 
         reasons = [
-            "Texture mismatch detected",
-            "Facial inconsistencies found",
-            "Possible AI-generated artifacts"
+            "Texture inconsistencies",
+            "Facial artifacts",
+            "Synthetic image patterns detected"
         ]
-
-
-    # -------------------------------
-    # Heatmap Path
-    # -------------------------------
-
-    filename = os.path.basename(image_path)
-
-    heatmap_name = (
-        "heatmap_" + filename
-    )
-
-    heatmap_path = os.path.join(
-        BASE_DIR,
-        "static",
-        "heatmaps",
-        heatmap_name
-    )
-
-
-    # Uncomment when GradCAM is enabled
-    #
-    # generate_gradcam(
-    #     model,
-    #     image_path,
-    #     heatmap_path
-    # )
-
-
-    # -------------------------------
-    # Return Results
-    # -------------------------------
 
     return {
 
         "prediction": predicted_class,
+
+        "confidence": round(confidence,2),
 
         "status": status,
 

@@ -4,37 +4,44 @@
 
 const fileInput = document.getElementById("file");
 const uploadBox = document.querySelector(".upload-box");
-const form = document.querySelector("form");
 const button = document.querySelector(".analyze-btn");
+const form = document.querySelector("form");
+
+// Create filename text
+const fileNameText = document.createElement("p");
+fileNameText.style.marginTop = "15px";
+fileNameText.style.fontWeight = "bold";
+fileNameText.style.color = "#00ffff";
+
+uploadBox.appendChild(fileNameText);
 
 // ----------------------------
-// Drag & Drop Highlight
+// Drag & Drop
 // ----------------------------
 
-uploadBox.addEventListener("dragover", (e) => {
+uploadBox.addEventListener("dragover", function(e){
     e.preventDefault();
     uploadBox.style.borderColor = "#00ff99";
-    uploadBox.style.background = "rgba(255,255,255,0.15)";
 });
 
-uploadBox.addEventListener("dragleave", () => {
+uploadBox.addEventListener("dragleave", function(){
     uploadBox.style.borderColor = "cyan";
-    uploadBox.style.background = "transparent";
 });
 
-uploadBox.addEventListener("drop", (e) => {
+uploadBox.addEventListener("drop", function(e){
+
     e.preventDefault();
 
     uploadBox.style.borderColor = "cyan";
-    uploadBox.style.background = "transparent";
 
     fileInput.files = e.dataTransfer.files;
 
     updateFileName();
+
 });
 
 // ----------------------------
-// Show Selected File Name
+// File Selection
 // ----------------------------
 
 fileInput.addEventListener("change", updateFileName);
@@ -43,26 +50,21 @@ function updateFileName(){
 
     if(fileInput.files.length > 0){
 
-        const fileName = fileInput.files[0].name;
+        fileNameText.innerHTML =
+            "Selected : " + fileInput.files[0].name;
 
-        uploadBox.innerHTML = `
-            <i class="fa-solid fa-image upload-icon"></i>
-            <h2>${fileName}</h2>
-            <p>Image Ready for Analysis</p>
-        `;
     }
+
 }
 
 // ----------------------------
-// Loading Animation
+// Loading
 // ----------------------------
 
 form.addEventListener("submit", function(){
 
-    button.innerHTML = `
-    <i class="fa-solid fa-spinner fa-spin"></i>
-    Analyzing...
-    `;
+    button.innerHTML =
+        '<i class="fa-solid fa-spinner fa-spin"></i> Analyzing...';
 
     button.disabled = true;
 
